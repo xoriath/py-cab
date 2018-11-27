@@ -34,7 +34,7 @@ class File:
 
     def __init__(self, buffer, offset: int):
         self.header = File.file_tuple._make(struct.unpack_from(File.file_format, buffer=buffer, offset=offset))
-        self.name = self._read_file_name(buffer, offset)
+        (self.name, self.name_length_bytes) = self._read_file_name(buffer, offset)
         self.logger = logging.getLogger()
 
     def __repr__(self):
@@ -45,9 +45,9 @@ class File:
         strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
         
         if self.is_name_utf:
-            return strings[0].decode('utf-8')
+            return (strings[0].decode('utf-8'), len(strings[0]))
         else:
-            return strings[0].decode('ascii')
+            return (strings[0].decode('ascii'), len(strings[0]))
 
     @property
     def is_read_only(self) -> bool:
@@ -113,7 +113,7 @@ class File:
 
     @property
     def size(self):
-        return struct.calcsize(File.file_format) + len(self.name) + 1 # +1 for NULL in name string
+        return struct.calcsize(File.file_format) + self.name_length_bytes + 1 # +1 for NULL in name string
 
 
 def create_files(header, buffer):
