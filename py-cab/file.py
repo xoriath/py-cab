@@ -1,5 +1,6 @@
 
 import collections
+import datetime
 import logging
 import struct
 
@@ -98,6 +99,12 @@ class File:
         second = (self.header.time << 1) & 0x3E
 
         return (hour, minute, second)
+
+    @property
+    def datetime(self):
+        year, month, day = self.date
+        hour, minute, second = self.time
+        return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
     @property
     def attributes(self):
