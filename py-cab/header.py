@@ -143,7 +143,6 @@ class Header:
 
 
 
-    @staticmethod
-    def create(buffer):
-        return Header(buffer)
+def create(buffer):
+    return Header(buffer)
     
