@@ -16,7 +16,8 @@ class CabExtractTests(unittest.TestCase):
             {'cab': 'case-ascii.cab', 'cases': 'case-ascii.txt'},
             {'cab': 'case-utf8.cab', 'cases': 'case-utf8.txt'},
             {'cab': 'encoding-koi8.cab', 'cases': 'encoding-koi8.txt', 'encoding': 'koi8-r'},
-            {'cab': 'encoding-latin1.cab', 'cases': 'encoding-latin1.txt', 'encoding': 'latin1'}
+            {'cab': 'encoding-latin1.cab', 'cases': 'encoding-latin1.txt', 'encoding': 'latin1'},
+            {'cab': 'encoding-sjis.cab', 'cases': 'encoding-sjis.txt', 'encoding': 'shift_jisx0213'}
         ]
 
         for test_case in test_cases:
