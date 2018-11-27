@@ -3,6 +3,8 @@ import collections
 import struct
 
 class Header:
+    """The CFHEADER structure provides information about this cabinet file.
+    """
 
     header_tuple = collections.namedtuple('CabHeaderTuple', 'signature0 signature1 signature2 signature3 cbCabinet coffFiles version_minor version_major cFolders cFiles flags setId iCabinet')
 

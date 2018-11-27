@@ -3,6 +3,12 @@ import collections
 import struct
 
 class Data:
+    """Each CFDATA record describes some amount of compressed data. 
+    
+    The first CFDATA entry for each folder is located using CFFOLDER.coffCabStart. Subsequent 
+    CFDATA records for this folder are contiguous. In a standard cabinet all the CFDATA entries 
+    are contiguous and in the same order as the CFFOLDER entries that refer them.
+    """
 
     data_tuple = collections.namedtuple('CabDataTuple', 'csum cbData cbUncomp')
     data_format = '<I2H'

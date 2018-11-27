@@ -4,6 +4,14 @@ import logging
 import struct
 
 class File:
+    """Each CFFILE entry contains information about one of the files stored (or at least partially stored) in this cabinet. 
+    The first CFFILE entry in each cabinet is found at absolute offset CFHEADER.coffFiles. In a standard cabinet file the 
+    first CFFILE entry immediately follows the last CFFOLDER entry. Subsequent CFFILE records for this cabinet are contiguous.
+
+    CFHEADER.cFiles indicates how many of these entries are in the cabinet. The CFFILE entries in a standard cabinet are ordered 
+    by iFolder value, then by uoffFolderStart. Entries for files continued from the previous cabinet will be first, and entries 
+    for files continued to the next cabinet will be last.
+    """
 
     MAX_STRING_LENGTH = 255
 
