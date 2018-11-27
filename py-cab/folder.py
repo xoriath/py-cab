@@ -1,6 +1,17 @@
 
 import collections
+import enum
 import struct
+
+
+class Compression(enum.Enum):
+    NONE = enum.auto()
+    MSZIP = enum.auto()
+    QUANTUM = enum.auto()
+    LZX = enum.auto()
+
+class FolderException(Exception):
+    pass
 
 class Folder:
     """Each CFFOLDER structure contains information about one of the folders or partial folders stored in this cabinet file. 
@@ -22,6 +33,12 @@ class Folder:
     folder_tuple = collections.namedtuple('CabFolderHeader', 'coffCabStart cCFData typeCompress')
     folder_format = '<I2H'
 
+    cffoldCOMPTYPE_MASK = 0x000f
+    cffoldCOMPTYPE_NONE = 0x0000
+    cffoldCOMPTYPE_MSZIP = 0x0001
+    cffoldCOMPTYPE_QUANTUM = 0x0002
+    cffoldCOMPTYPE_LZX = 0x0003
+
     def __init__(self, buffer, offset, reserved):
         self.header = Folder.folder_tuple._make(struct.unpack_from(Folder.folder_format, buffer=buffer, offset=offset))
 
@@ -41,7 +58,16 @@ class Folder:
 
     @property
     def compression(self):
-        return self.header.typeCompress
+        if self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK == Folder.cffoldCOMPTYPE_NONE:
+            return Compression.NONE
+        if self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK == Folder.cffoldCOMPTYPE_MSZIP:
+            return Compression.MSZIP
+        if self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK == Folder.cffoldCOMPTYPE_QUANTUM:
+            return Compression.QUANTUM
+        if self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK == Folder.cffoldCOMPTYPE_LZX:
+            return Compression.LZX
+
+        raise FolderException('Folder compression 0x{:02X} is not known'.format(self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK))
 
     @property
     def size(self):

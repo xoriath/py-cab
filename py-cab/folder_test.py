@@ -31,7 +31,7 @@ class TestFolder(unittest.TestCase):
         self.assertEqual(1, len(self.folders))
 
     def test_compression(self):
-        self.assertEqual(0, self.folders[0].compression)
+        self.assertEqual(folder.Compression.NONE, self.folders[0].compression)
 
     def test_number_of_data_entries(self):
         self.assertEqual(1, self.folders[0].number_of_data_entries)
