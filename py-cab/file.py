@@ -32,22 +32,25 @@ class File:
     _A_EXEC = 0x40
     _A_NAME_IS_UTF = 0x80
 
-    def __init__(self, buffer, offset: int):
+    def __init__(self, buffer, offset: int, encoding: str):
         self.header = File.file_tuple._make(struct.unpack_from(File.file_format, buffer=buffer, offset=offset))
-        (self.name, self.name_length_bytes) = self._read_file_name(buffer, offset)
+        (self.name, self.name_length_bytes) = self._read_file_name(buffer, offset, encoding)
         self.logger = logging.getLogger()
 
     def __repr__(self):
         return '<File {name}: {header}>'.format(name=self.name, header=self.header.__repr__())
 
-    def _read_file_name(self, buffer, offset: int) -> str:
+    def _read_file_name(self, buffer, offset: int, encoding: str) -> str:
         offset += struct.calcsize(File.file_format)
         strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
         
-        if self.is_name_utf:
-            return (strings[0].decode('utf-8'), len(strings[0]))
+        if encoding:
+            return (strings[0].decode(encoding), len(strings[0]))
         else:
-            return (strings[0].decode('ascii'), len(strings[0]))
+            if self.is_name_utf:
+                return (strings[0].decode('utf-8'), len(strings[0]))
+            else:
+                return (strings[0].decode('ascii'), len(strings[0]))
 
     @property
     def is_read_only(self) -> bool:
@@ -116,12 +119,12 @@ class File:
         return struct.calcsize(File.file_format) + self.name_length_bytes + 1 # +1 for NULL in name string
 
 
-def create_files(header, buffer):
+def create_files(header, buffer, encoding=None):
     number_of_files = header.number_of_files
     offset = header.first_file_enty_offset
 
     for _ in range(number_of_files):
-        file = File(buffer, offset)
+        file = File(buffer, offset, encoding)
         offset += file.size
         yield file
         
