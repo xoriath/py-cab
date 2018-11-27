@@ -16,7 +16,7 @@ class File:
 
     MAX_STRING_LENGTH = 255
 
-    file_tuple = collections.namedtuple('CabFileTuple', 'cbFile uoffFolderStart iFolder date time attribs')
+    file_tuple = collections.namedtuple('CabFileHeader', 'cbFile uoffFolderStart iFolder date time attribs')
     file_format = '<2I4H'
 
     # Flags in folder index
@@ -38,15 +38,16 @@ class File:
         self.logger = logging.getLogger()
 
     def __repr__(self):
-        return '<File {name}: {header}>'.format(name=self.name, header=self.header)
+        return '<File {name}: {header}>'.format(name=self.name, header=self.header.__repr__())
 
     def _read_file_name(self, buffer, offset: int) -> str:
-        if not self.is_name_utf:
-            offset += struct.calcsize(File.file_format)
-            strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
-            return strings[0].decode('ascii')
+        offset += struct.calcsize(File.file_format)
+        strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
+        
+        if self.is_name_utf:
+            raise strings[0].decode('utf-8')
         else:
-            raise Exception("Cannot decode utf characters")
+            return strings[0].decode('ascii')
 
     @property
     def is_read_only(self) -> bool:

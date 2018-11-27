@@ -19,7 +19,7 @@ class Folder:
     The typeCompress field may vary from one folder to the next, unless the folder is continued from a previous cabinet file.
     """
 
-    folder_tuple = collections.namedtuple('CabFolderTuple', 'coffCabStart cCFData typeCompress')
+    folder_tuple = collections.namedtuple('CabFolderHeader', 'coffCabStart cCFData typeCompress')
     folder_format = '<I2H'
 
     def __init__(self, buffer, offset, reserved):
@@ -27,6 +27,9 @@ class Folder:
 
         reserved_offset = offset + struct.calcsize(Folder.folder_format)
         self.reserved = buffer[reserved_offset : reserved_offset + reserved]
+
+    def __repr__(self):
+        return '<Folder {header}>'.format(header=self.header.__repr__())
 
     @property 
     def first_data_entry_offset(self):

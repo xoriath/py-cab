@@ -6,7 +6,7 @@ class Header:
     """The CFHEADER structure provides information about this cabinet file.
     """
 
-    header_tuple = collections.namedtuple('CabHeaderTuple', 'signature0 signature1 signature2 signature3 cbCabinet coffFiles version_minor version_major cFolders cFiles flags setId iCabinet')
+    header_tuple = collections.namedtuple('CabHeader', 'signature0 signature1 signature2 signature3 cbCabinet coffFiles version_minor version_major cFolders cFiles flags setId iCabinet')
 
     header_format = '<4c4xI4xI4x2B5H'
     optional_reserved_fields_format = '<H2B'
@@ -28,7 +28,7 @@ class Header:
 
 
     def __repr__(self):
-        return self.header.__repr__()
+        return '<Header {header}>'.format(header=self.header.__repr__())
 
     @property
     def signature(self):

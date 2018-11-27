@@ -10,7 +10,7 @@ class Data:
     are contiguous and in the same order as the CFFOLDER entries that refer them.
     """
 
-    data_tuple = collections.namedtuple('CabDataTuple', 'csum cbData cbUncomp')
+    data_tuple = collections.namedtuple('CabDataHeader', 'csum cbData cbUncomp')
     data_format = '<I2H'
 
     def __init__(self, buffer, offset, reserved_size):
@@ -23,6 +23,9 @@ class Data:
 
         self.reserved = buffer[reserved_start : reserved_end]
         self.raw_data = buffer[data_start : data_end]
+
+    def __repr__(self):
+        return '<Data {header}'.format(header=self.header.__repr__())
 
     @property 
     def raw_size(self):
