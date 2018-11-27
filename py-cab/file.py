@@ -45,7 +45,7 @@ class File:
         strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
         
         if self.is_name_utf:
-            raise strings[0].decode('utf-8')
+            return strings[0].decode('utf-8')
         else:
             return strings[0].decode('ascii')
 
