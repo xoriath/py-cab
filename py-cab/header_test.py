@@ -43,10 +43,10 @@ class TestHeader(unittest.TestCase):
         self.assertEqual(0, self.header.reserved_in_header)
         self.assertEqual(0, self.header.reserved_in_folder)
         self.assertEqual(0, self.header.reserved_in_data)
-        self.assertEqual([], self.header.previous_cabinet)
-        self.assertEqual([], self.header.previous_disk)
-        self.assertEqual([], self.header.next_cabinet)
-        self.assertEqual([], self.header.next_disk)
+        self.assertEqual('', self.header.previous_cabinet)
+        self.assertEqual('', self.header.previous_disk)
+        self.assertEqual('', self.header.next_cabinet)
+        self.assertEqual('', self.header.next_disk)
         self.assertEqual([], self.header.reserved_data)
 
     def test_header_size(self):
