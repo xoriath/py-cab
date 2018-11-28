@@ -6,7 +6,7 @@ import data
 import header
 import folder
 import file
-from test_data import read_cabextract_cab, read_cabextract_cases
+from test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
 
 
 
@@ -35,12 +35,8 @@ class CabExtractTests(unittest.TestCase):
             self.assertHeaderAndFiles(h, files, cases)
 
     def test_mixed(self):
-        buffer = read_cabextract_cab('split-4.cab')
+        buffer = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab'))
         
-        cab = cabinet.Cabinet(buffer)
-
-
-
         import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, h, files, cases):
