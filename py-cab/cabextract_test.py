@@ -1,6 +1,7 @@
 import unittest
 import os.path
 
+import cabinet
 import data
 import header
 import folder
@@ -11,7 +12,7 @@ from test_data import read_cabextract_cab, read_cabextract_cases
 
 class CabExtractTests(unittest.TestCase):
 
-    def test_filenames(self):
+    def test_encodings(self):
         test_cases = [
             {'cab': 'case-ascii.cab', 'cases': 'case-ascii.txt'},
             {'cab': 'case-utf8.cab', 'cases': 'case-utf8.txt'},
@@ -32,6 +33,15 @@ class CabExtractTests(unittest.TestCase):
             files = list(file.create_files(h, buffer, encoding=encoding))
 
             self.assertHeaderAndFiles(h, files, cases)
+
+    def test_mixed(self):
+        buffer = read_cabextract_cab('split-4.cab')
+        
+        cab = cabinet.Cabinet(buffer)
+
+
+
+        import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, h, files, cases):
         self.assertEqual(1, h.number_of_folders)
