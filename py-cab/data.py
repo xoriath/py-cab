@@ -1,5 +1,6 @@
 
 import collections
+import logging
 import struct
 
 class Data:
@@ -23,6 +24,9 @@ class Data:
 
         self.reserved = buffer[reserved_start : reserved_end]
         self.raw_data = buffer[data_start : data_end]
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Parsed data: %s', self.__repr__())
 
     def __repr__(self):
         return '<Data checksum={cheksum} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,

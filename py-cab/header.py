@@ -1,5 +1,6 @@
 
 import collections
+import logging
 import struct
 
 class Header:
@@ -25,6 +26,9 @@ class Header:
         self._read_reserved_data(buffer)
         self._read_previous_info(buffer)
         self._read_next_info(buffer)
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Parsed header: %s', self.__repr__())
 
 
     def __repr__(self):

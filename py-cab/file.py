@@ -35,10 +35,12 @@ class File:
     def __init__(self, buffer, offset: int, encoding: str):
         self.header = File.file_tuple._make(struct.unpack_from(File.file_format, buffer=buffer, offset=offset))
         (self.name, self.name_length_bytes) = self._read_file_name(buffer, offset, encoding)
-        self.logger = logging.getLogger()
+        
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Parsed file: %s', self.__repr__())
 
     def __repr__(self):
-        return '<File {name}: {header}>'.format(name=self.name, header=self.header.__repr__())
+        return '<File {name} ({bytes} bytes): {header}>'.format(name=self.name, bytes=self.file_size, header=self.header.__repr__())
 
     def _read_file_name(self, buffer, offset: int, encoding: str) -> str:
         offset += struct.calcsize(File.file_format)

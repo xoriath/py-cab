@@ -1,6 +1,7 @@
 
 import collections
 import enum
+import logging
 import struct
 
 
@@ -45,6 +46,9 @@ class Folder:
 
         reserved_offset = offset + struct.calcsize(Folder.folder_format)
         self.reserved = buffer[reserved_offset : reserved_offset + reserved]
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Parsed folder: %s', self.__repr__())
 
     def __repr__(self):
         return '<Folder index={index} compression={compression} data_entries={number_of_data_entries}>'.format(index=self.index,
