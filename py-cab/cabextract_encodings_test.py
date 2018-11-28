@@ -1,12 +1,12 @@
 import unittest
 import os.path
 
+import data
 import header
 import folder
 import file
-import data
+from test_data import read_cabextract_cab, read_cabextract_cases
 
-CABEXTRACT_TEST_DIR = os.path.join(os.path.dirname(__file__), 'test-data', 'cabextract', 'cabs')
 
 
 class CabExtractTests(unittest.TestCase):
@@ -25,8 +25,8 @@ class CabExtractTests(unittest.TestCase):
             cases = test_case.get('cases')
             encoding = test_case.get('encoding', 'utf-8')
 
-            buffer = read_cab(cab)
-            cases = read_cases(cases, encoding=encoding)
+            buffer = read_cabextract_cab(cab)
+            cases = read_cabextract_cases(cases, encoding=encoding)
             
             h = header.create(buffer)
             files = list(file.create_files(h, buffer, encoding=encoding))
@@ -39,13 +39,4 @@ class CabExtractTests(unittest.TestCase):
 
         for (f, case) in zip(files, cases):
             self.assertEqual(case, f.name)
-
-
-def read_cab(file_name):
-    with open(os.path.join(CABEXTRACT_TEST_DIR, file_name), 'rb') as f:
-        return f.read()
-
-def read_cases(file_name, encoding='utf-8'):
-    with open(os.path.join(CABEXTRACT_TEST_DIR, file_name), 'rb') as f:
-        return [line.rstrip().decode(encoding) for line in f.readlines() if not line.startswith(b'#')]
 
