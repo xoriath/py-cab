@@ -18,9 +18,9 @@ class Header:
     cfhdrNEXT_CABINET = 0x0002
     cfhdrRESERVE_PRESENT = 0x0004
 
-    def __init__(self, buffer):
+    def __init__(self, buffer, encoding='utf-8'):
         self.header = Header.header_tuple._make(struct.unpack_from(Header.header_format, buffer=buffer, offset=0))
-       
+        self.encoding = encoding
         self._read_reserved_fields(buffer)
         self._read_reserved_data(buffer)
         self._read_previous_info(buffer)
@@ -103,11 +103,11 @@ class Header:
                 offset += struct.calcsize(Header.optional_reserved_fields_format) + self.reserved_in_header
 
             strings = buffer[offset : offset + Header.MAX_STRING_LENGTH].split(b'\x00')
-            self.previous_cabinet = strings[0]
-            self.previous_disk = strings[1]
+            self.previous_cabinet = strings[0].decode(self.encoding)
+            self.previous_disk = strings[1].decode(self.encoding)
         else:
-            self.previous_cabinet = []
-            self.previous_disk = []
+            self.previous_cabinet = str()
+            self.previous_disk = str()
 
     def _read_next_info(self, buffer):
         if self.has_next_cabinet:
@@ -117,14 +117,14 @@ class Header:
 
             strings = buffer[offset : offset + Header.MAX_STRING_LENGTH].split(b'\x00')
             if not self.has_previous_cabinet:
-                self.next_cabinet = strings[0]
-                self.next_disk = strings[1]
+                self.next_cabinet = strings[0].decode(self.encoding)
+                self.next_disk = strings[1].decode(self.encoding)
             else:
-                self.next_cabinet = strings[2]
-                self.next_disk = strings[3]
+                self.next_cabinet = strings[2].decode(self.encoding)
+                self.next_disk = strings[3].decode(self.encoding)
         else:
-            self.next_cabinet = []
-            self.next_disk = []
+            self.next_cabinet = str()
+            self.next_disk = str()
 
     @property
     def header_size(self):

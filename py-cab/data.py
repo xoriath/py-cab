@@ -25,7 +25,9 @@ class Data:
         self.raw_data = buffer[data_start : data_end]
 
     def __repr__(self):
-        return '<Data {header}'.format(header=self.header.__repr__())
+        return '<Data checksum={cheksum} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,
+                                                                                                         raw_size=self.raw_size,
+                                                                                                         uncompressed_size=self.uncompressed_size)
 
     @property 
     def raw_size(self):

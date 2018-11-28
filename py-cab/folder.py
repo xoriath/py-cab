@@ -39,14 +39,17 @@ class Folder:
     cffoldCOMPTYPE_QUANTUM = 0x0002
     cffoldCOMPTYPE_LZX = 0x0003
 
-    def __init__(self, buffer, offset, reserved):
+    def __init__(self, index, buffer, offset, reserved):
+        self.index = index
         self.header = Folder.folder_tuple._make(struct.unpack_from(Folder.folder_format, buffer=buffer, offset=offset))
 
         reserved_offset = offset + struct.calcsize(Folder.folder_format)
         self.reserved = buffer[reserved_offset : reserved_offset + reserved]
 
     def __repr__(self):
-        return '<Folder {header}>'.format(header=self.header.__repr__())
+        return '<Folder index={index} compression={compression} data_entries={number_of_data_entries}>'.format(index=self.index,
+                                                                                                               compression=self.compression,
+                                                                                                               number_of_data_entries=self.number_of_data_entries)
 
     @property 
     def first_data_entry_offset(self):
@@ -79,8 +82,8 @@ def create_folders(header, buffer):
     offset = header.header_size
     folder_reserved = header.reserved_in_folder
 
-    for _ in range(number_of_folders):
-        folder = Folder(buffer, offset, folder_reserved)
+    for i in range(number_of_folders):
+        folder = Folder(i, buffer, offset, folder_reserved)
         offset += folder.size
         yield folder
         
