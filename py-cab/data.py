@@ -88,10 +88,19 @@ class Data:
         raise UnhandledCompression(self.compression)
 
     def decompress_mszip(self):
-        if not self.raw_data[:2].decode('utf-8') == 'CK':
-            raise InvalidCompressionPrefix('Invalid compression prefix on data block')
+        if not self.has_mszip_signature(self.raw_data):
+            raise InvalidCompressionPrefix('Invalid MSZIP compressor signature in data block')
 
         return self.deflate(self.raw_data[2:])
+
+    @staticmethod
+    def has_mszip_signature(block):
+        """ [...] A two-byte MSZIP signature precedes the compressed encoding in each block, consisting of the bytes 0x43, 0x4B.
+        
+        From https://msdn.microsoft.com/en-us/library/bb417343.aspx#imp_details
+        """
+
+        return block[:2].decode('utf-8') == 'CK'
 
 
     @staticmethod

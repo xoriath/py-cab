@@ -36,9 +36,11 @@ class TestCompressedData(unittest.TestCase):
     def setUp(self):
         self.cab = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'mixed.cab'))
         
-        self.expected_mszip_content = b'If you can read this, the MSZIP decompressor is working!\n'
-        self.expected_lzx_content = b'-----------------------------------------------------------------\nIf you can read this, the LZX decompressor is working!\n-----------------------------------------------------------------\n'
         self.expected_quantum_content = b'If you can read this, the Quantum decompressor is working!\n'
+        self.expected_mszip_content = b'If you can read this, the MSZIP decompressor is working!\n'
+        self.expected_lzx_content = b'-----------------------------------------------------------------\n' \
+                                    b'If you can read this, the LZX decompressor is working!\n' \
+                                    b'-----------------------------------------------------------------\n'
 
 
     def test_mszip_compression(self):
