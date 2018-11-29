@@ -28,4 +28,5 @@ class TestData(unittest.TestCase):
         self.assertEqual(0x97, data.uncompressed_size)
         self.assertEqual(0, len(data.reserved))
         self.assertEqual(0x97, len(data.raw_data))
+        self.assertTrue(data.valid())
         self.assertSequenceEqual(RAW_DATA_BLOCK, data.raw_data)

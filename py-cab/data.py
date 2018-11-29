@@ -1,5 +1,6 @@
 
 import collections
+from itertools import zip_longest
 import logging
 import struct
 
@@ -25,13 +26,17 @@ class Data:
         self.reserved = buffer[reserved_start : reserved_end]
         self.raw_data = buffer[data_start : data_end]
 
+        self.calculated_checksum = self._calculate_checksum()
+        
+
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Parsed data: %s', self.__repr__())
 
     def __repr__(self):
-        return '<Data checksum={cheksum} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,
-                                                                                                         raw_size=self.raw_size,
-                                                                                                         uncompressed_size=self.uncompressed_size)
+        return '<Data checksum={cheksum} valid={valid} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,
+                                                                                                                       valid=self.valid(),
+                                                                                                                       raw_size=self.raw_size,
+                                                                                                                       uncompressed_size=self.uncompressed_size)
 
     @property 
     def raw_size(self):
@@ -48,6 +53,40 @@ class Data:
     @property
     def size(self):
         return struct.calcsize(Data.data_format) + len(self.reserved) + len(self.raw_data)
+
+    def valid(self):
+        return self.checksum == self.calculated_checksum
+
+    
+    def _calculate_checksum(self):
+        """ Calculate the checksum of the data and the partial header
+        
+        From https://msdn.microsoft.com/en-us/library/bb417343.aspx#chksum 
+        """
+        data_checksum = Data._compute_checksum(self.raw_data)
+        partial_header = bytearray(struct.pack('<HH', self.raw_size, self.uncompressed_size))
+        return Data._compute_checksum(partial_header, seed=data_checksum)
+
+
+    @staticmethod
+    def _compute_checksum(buffer, seed=0):
+        accumulator = seed
+        
+        for group in Data.group_by(4, buffer):
+            if group.count(None) == 0:
+                accumulator ^= group[0] | group[1] << 8 |group[2] << 16 | group[3] << 24
+            elif group.count(None) == 1:
+                accumulator ^= group[0] << 16 | group[1] << 8 | group[2] << 0
+            elif group.count(None) == 2:
+                accumulator ^= group[0] << 8 | group[1]
+            elif group.count(None) == 3:
+                accumulator ^= group[0]
+
+        return accumulator
+
+    @staticmethod
+    def group_by(n, iterable, padvalue=None):
+        return zip_longest(*[iter(iterable)]*n, fillvalue=padvalue)
 
 
 def create_datas(header, folder, buffer):
