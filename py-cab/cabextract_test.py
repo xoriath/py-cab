@@ -37,7 +37,7 @@ class CabExtractTests(unittest.TestCase):
     def test_mixed(self):
         buffer = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab'))
         
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, h, files, cases):
         self.assertEqual(1, h.number_of_folders)

@@ -43,7 +43,7 @@ def open_cab(path):
         current_cab = read_cab(os.path.join(current_dir, current_cab.header.next_cabinet))
         cabinets[current_cab.header.sequence] = current_cab
 
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
 
 
 def read_cab(path):
