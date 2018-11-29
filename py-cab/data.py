@@ -3,6 +3,25 @@ import collections
 from itertools import zip_longest
 import logging
 import struct
+import zlib
+
+import folder
+
+class InvalidChecksum(Exception):
+    def __init__(self, actual, expected):
+        super('Invalid checksum of data block ({actual} != {expected})'.format(actual=actual, expected=expected))
+
+class UnhandledCompression(Exception):
+    def __init__(self, compression):
+        super('Cannot handle compression {compression}'.format(compression=compression))
+
+class InvalidCompressionPrefix(Exception):
+    pass
+
+class CompressionCorruption(Exception):
+    def __init__(self, inner):
+        super('Failed to decompress data: ' + str(inner))
+        self.inner = inner
 
 class Data:
     """Each CFDATA record describes some amount of compressed data. 
@@ -15,8 +34,9 @@ class Data:
     data_tuple = collections.namedtuple('CabDataHeader', 'csum cbData cbUncomp')
     data_format = '<I2H'
 
-    def __init__(self, buffer, offset, reserved_size):
+    def __init__(self, buffer: bytearray, offset: int, compression: folder.Compression, reserved_size: int):
         self.header = Data.data_tuple._make(struct.unpack_from(Data.data_format, buffer=buffer, offset=offset))
+        self.compression = compression
 
         reserved_start = offset + struct.calcsize(Data.data_format)
         reserved_end = reserved_start + reserved_size
@@ -27,14 +47,13 @@ class Data:
         self.raw_data = buffer[data_start : data_end]
 
         self.calculated_checksum = self._calculate_checksum()
-        
 
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Parsed data: %s', self.__repr__())
 
     def __repr__(self):
         return '<Data checksum={cheksum} valid={valid} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,
-                                                                                                                       valid=self.valid(),
+                                                                                                                       valid=self.valid_checksum(),
                                                                                                                        raw_size=self.raw_size,
                                                                                                                        uncompressed_size=self.uncompressed_size)
 
@@ -54,8 +73,34 @@ class Data:
     def size(self):
         return struct.calcsize(Data.data_format) + len(self.reserved) + len(self.raw_data)
 
-    def valid(self):
+    def valid_checksum(self):
         return self.checksum == self.calculated_checksum
+
+    def data(self):
+        if not self.checksum == self.calculated_checksum:
+            raise InvalidChecksum(self.checksum, self.calculated_checksum)
+
+        if self.compression == folder.Compression.NONE:
+            return self.raw_data
+        if self.compression == folder.Compression.MSZIP:
+            return self.decompress_mszip()
+
+        raise UnhandledCompression(self.compression)
+
+    def decompress_mszip(self):
+        if not self.raw_data[:2].decode('utf-8') == 'CK':
+            raise InvalidCompressionPrefix('Invalid compression prefix on data block')
+
+        return self.deflate(self.raw_data[2:])
+
+
+    @staticmethod
+    def deflate(buffer):
+        try:
+            wbits_deflate = -zlib.MAX_WBITS
+            return zlib.decompress(buffer, wbits=wbits_deflate)
+        except zlib.error as e:
+            raise CompressionCorruption(e)
 
     
     def _calculate_checksum(self):
@@ -91,10 +136,11 @@ class Data:
 
 def create_datas(header, folder, buffer):
     offset = folder.first_data_entry_offset
+    compression = folder.compression
     number_of_data = folder.number_of_data_entries
     reserved_size = header.reserved_in_data
 
     for _ in range(number_of_data):
-        data = Data(buffer, offset, reserved_size)
+        data = Data(buffer, offset, compression, reserved_size)
         offset += data.size
         yield data

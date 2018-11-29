@@ -9,6 +9,7 @@ import header
 class Cabinet:
 
     def __init__(self, buffer):
+        self.buffer = buffer
         self.header = header.create(buffer)
         self.folders = list(folder.create_folders(self.header, buffer))
         self.files = list(file.create_files(self.header, buffer))
