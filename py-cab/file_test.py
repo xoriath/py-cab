@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 import header
@@ -20,6 +21,7 @@ class TestFile(unittest.TestCase):
         
         self.assertTupleEqual((1997, 3, 12), hello_c.date)
         self.assertTupleEqual((11, 13, 52), hello_c.time)
+        self.assertEqual(datetime.datetime(year=1997, month=3, day=12, hour=11, minute=13, second=52), hello_c.datetime)
         
         self.assertEqual(0x4D, hello_c.file_size)
         self.assertEqual(0, hello_c.offset_of_file_in_folder)
@@ -32,6 +34,7 @@ class TestFile(unittest.TestCase):
 
         self.assertTupleEqual((1997, 3, 12), welcome_c.date)
         self.assertTupleEqual((11, 15, 14), welcome_c.time)
+        self.assertEqual(datetime.datetime(year=1997, month=3, day=12, hour=11, minute=15, second=14), welcome_c.datetime)
 
         self.assertEqual(0x4A, welcome_c.file_size)
         self.assertEqual(0x4D, welcome_c.offset_of_file_in_folder)
