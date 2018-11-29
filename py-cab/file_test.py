@@ -5,14 +5,12 @@ import file
 
 from test_data import read_cabextract_cab
 
-# From https://msdn.microsoft.com/en-us/library/bb417343.aspx#sample_cab
-TEST_CAB = read_cabextract_cab('simple.cab')
-
 class TestFile(unittest.TestCase):
 
     def setUp(self):
-        self.header = header.Header(TEST_CAB)
-        self.files = list(file.create_files(self.header, TEST_CAB))
+        self.cab = read_cabextract_cab('simple.cab')
+        self.header = header.Header(self.cab)
+        self.files = list(file.create_files(self.header, self.cab))
 
     def test_found_files(self):
         self.assertEqual(2, len(self.files))

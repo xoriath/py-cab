@@ -6,18 +6,16 @@ import data
 
 from test_data import read_cabextract_cab
 
-# From https://msdn.microsoft.com/en-us/library/bb417343.aspx#sample_cab
-TEST_CAB = read_cabextract_cab('simple.cab')
-
-RAW_DATA_BLOCK = TEST_CAB[0x66:]
-
 class TestData(unittest.TestCase):
 
     def setUp(self):
-        self.header = header.Header(TEST_CAB)
-        self.folders = list(folder.create_folders(self.header, TEST_CAB))
+        self.cab = read_cabextract_cab('simple.cab')
+        self.raw_data_block = self.cab[0x66:]
+
+        self.header = header.Header(self.cab)
+        self.folders = list(folder.create_folders(self.header, self.cab))
         self.folder = self.folders[0]
-        self.datas = list(data.create_datas(self.header, self.folder, TEST_CAB))
+        self.datas = list(data.create_datas(self.header, self.folder, self.cab))
 
     def test_data_block(self):
         self.assertEqual(1, len(self.datas))
@@ -29,4 +27,4 @@ class TestData(unittest.TestCase):
         self.assertEqual(0, len(data.reserved))
         self.assertEqual(0x97, len(data.raw_data))
         self.assertTrue(data.valid())
-        self.assertSequenceEqual(RAW_DATA_BLOCK, data.raw_data)
+        self.assertSequenceEqual(self.raw_data_block, data.raw_data)

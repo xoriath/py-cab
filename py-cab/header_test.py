@@ -4,13 +4,11 @@ import header
 
 from test_data import read_cabextract_cab
 
-# From https://msdn.microsoft.com/en-us/library/bb417343.aspx#sample_cab
-TEST_CAB = read_cabextract_cab('simple.cab')
-
 class TestHeader(unittest.TestCase):
 
     def setUp(self):
-        self.header = header.Header(TEST_CAB)
+        self.cab = read_cabextract_cab('simple.cab')
+        self.header = header.Header(self.cab)
 
     def test_signature(self):
         self.assertEqual('MSCF', self.header.signature)
