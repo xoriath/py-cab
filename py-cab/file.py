@@ -47,12 +47,12 @@ class File:
         strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
         
         if encoding:
-            return (strings[0].decode(encoding), len(strings[0]))
+            return (strings[0].decode(encoding=encoding, errors='replace'), len(strings[0]))
         else:
             if self.is_name_utf:
-                return (strings[0].decode('utf-8'), len(strings[0]))
+                return (strings[0].decode(encoding='utf-8', errors='replace'), len(strings[0]))
             else:
-                return (strings[0].decode('ascii'), len(strings[0]))
+                return (strings[0].decode(encoding='ascii', errors='replace'), len(strings[0]))
 
     @property
     def is_read_only(self) -> bool:
