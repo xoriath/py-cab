@@ -1,8 +1,10 @@
+import struct
 import unittest
 
 import header
+import cabinet
 
-from test_data import read_cabextract_cab
+from test_data import read_cabextract_cab, read_libmspack_cab
 
 class TestHeader(unittest.TestCase):
 
@@ -49,3 +51,13 @@ class TestHeader(unittest.TestCase):
 
     def test_header_size(self):
         self.assertEqual(0x24, self.header.header_size)
+
+class TestHeaderErrorConditions(unittest.TestCase):
+
+    def test_bad_signature(self):
+        f = read_libmspack_cab('bad_signature.cab')
+        
+        with self.assertRaises(struct.error):
+            cabinet.Cabinet(f)
+
+    

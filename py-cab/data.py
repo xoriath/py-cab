@@ -8,20 +8,16 @@ import zlib
 import folder
 
 class InvalidChecksum(Exception):
-    def __init__(self, actual, expected):
-        super('Invalid checksum of data block ({actual} != {expected})'.format(actual=actual, expected=expected))
+    pass
 
 class UnhandledCompression(Exception):
-    def __init__(self, compression):
-        super('Cannot handle compression {compression}'.format(compression=compression))
+    pass
 
 class InvalidCompressionPrefix(Exception):
     pass
 
 class CompressionCorruption(Exception):
-    def __init__(self, inner):
-        super('Failed to decompress data: ' + str(inner))
-        self.inner = inner
+    pass
 
 class Data:
     """Each CFDATA record describes some amount of compressed data. 
@@ -78,14 +74,14 @@ class Data:
 
     def data(self):
         if not self.checksum == self.calculated_checksum:
-            raise InvalidChecksum(self.checksum, self.calculated_checksum)
+            raise InvalidChecksum('Invalid checksum of data block ({actual} != {expected})'.format(actual=self.checksum, expected=self.calculated_checksum))
 
         if self.compression == folder.Compression.NONE:
             return self.raw_data
         if self.compression == folder.Compression.MSZIP:
             return self.decompress_mszip()
 
-        raise UnhandledCompression(self.compression)
+        raise UnhandledCompression('Cannot handle compression {compression}'.format(compression=self.compression))
 
     def decompress_mszip(self):
         if not self.has_mszip_signature(self.raw_data):
@@ -109,7 +105,7 @@ class Data:
             wbits_deflate = -zlib.MAX_WBITS
             return zlib.decompress(buffer, wbits=wbits_deflate)
         except zlib.error as e:
-            raise CompressionCorruption(e)
+            raise CompressionCorruption('Failed to decompress data: ' + str(e))
 
     
     def _calculate_checksum(self):
