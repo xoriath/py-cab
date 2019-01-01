@@ -1,3 +1,4 @@
+
 import unittest
 import os.path
 
@@ -18,7 +19,8 @@ class CabExtractTests(unittest.TestCase):
             {'cab': 'case-utf8.cab', 'cases': 'case-utf8.txt'},
             {'cab': 'encoding-koi8.cab', 'cases': 'encoding-koi8.txt', 'encoding': 'koi8-r'},
             {'cab': 'encoding-latin1.cab', 'cases': 'encoding-latin1.txt', 'encoding': 'latin1'},
-            {'cab': 'encoding-sjis.cab', 'cases': 'encoding-sjis.txt', 'encoding': 'shift_jisx0213'}
+            {'cab': 'encoding-sjis.cab', 'cases': 'encoding-sjis.txt', 'encoding': 'shift_jisx0213'},
+            {'cab': 'utf8-stresstest.cab', 'cases': 'utf8-stresstest.txt', 'encoding': 'utf-8'}
         ]
 
         for test_case in test_cases:
@@ -27,22 +29,25 @@ class CabExtractTests(unittest.TestCase):
             encoding = test_case.get('encoding', 'utf-8')
 
             buffer = read_cabextract_cab(cab)
-            cases = read_cabextract_cases(cases, encoding=encoding)
+            cabextract_cases = read_cabextract_cases(cases, encoding=encoding)
             
             h = header.create(buffer)
             files = list(file.create_files(h, buffer, encoding=encoding))
 
-            self.assertHeaderAndFiles(h, files, cases)
+            self.assertHeaderAndFiles(cab, h, files, cabextract_cases)
 
     def test_mixed(self):
         buffer = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab'))
         
         #import pdb; pdb.set_trace()
 
-    def assertHeaderAndFiles(self, h, files, cases):
-        self.assertEqual(1, h.number_of_folders)
-        self.assertEqual(len(cases), h.number_of_files)
+    def assertHeaderAndFiles(self, cab, h, files, cases):
+        self.assertEqual(1, h.number_of_folders, 'Wrong number of folders in {}'.format(cab))
+        self.assertEqual(len(cases), h.number_of_files, 'Wrong number of files in {}'.format(cab))
 
         for (f, case) in zip(files, cases):
-            self.assertEqual(case, f.name)
+            self.assertEqual(case, f.name, '[{cab}] Error in case: \n{case} != \n{name}'.format(
+                                            cab=cab, 
+                                            case=":".join(c.encode().hex() for c in case), 
+                                            name=":".join(c.encode().hex() for c in f.name)))
 

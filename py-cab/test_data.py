@@ -21,6 +21,6 @@ def read_cab(directory, file_name):
 
 def read_cabextract_cases(file_name, encoding='utf-8'):
     with open(os.path.join(CABEXTRACT_TEST_DIR, file_name), 'r', encoding=encoding, errors='replace') as f:
-        return [line.rstrip() for line in f.readlines() if not line.startswith('#') and line.strip()]
+        return [line.rstrip('\n') for line in f.readlines() if not line.startswith('#') and line.strip()]
 
 
