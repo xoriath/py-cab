@@ -1,10 +1,8 @@
 import datetime
 import unittest
 
-import header
-import file
-
-from test_data import read_cabextract_cab
+from cab import header, file
+from cab.test_data import read_cabextract_cab
 
 class TestFile(unittest.TestCase):
 

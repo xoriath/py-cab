@@ -2,12 +2,8 @@
 import unittest
 import os.path
 
-import cabinet
-import data
-import header
-import folder
-import file
-from test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
+from cab import cabinet, data, header, folder, file
+from cab.test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
 
 
 

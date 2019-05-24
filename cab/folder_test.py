@@ -1,9 +1,7 @@
 import unittest
 
-import header
-import folder
-
-from test_data import read_cabextract_cab
+from cab import header, folder
+from cab.test_data import read_cabextract_cab
 
 class TestFolder(unittest.TestCase):
 
