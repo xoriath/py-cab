@@ -94,7 +94,6 @@ class TestHugeCompressedData(): # unittest.TestCase
         self.cab = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'large-files-cab.cab'))
 
     def test_mszip_compression(self):
-        import pdb; pdb.set_trace()
         mszip_files = list(filter(lambda x: x.name == 'mszip-2gb.txt', self.cab.files))
         self.assertEqual(1, len(mszip_files))
 

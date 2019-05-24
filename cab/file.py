@@ -40,7 +40,7 @@ class File:
         self.logger.debug('Parsed file: %s', self.__repr__())
 
     def __repr__(self):
-        return '<File {name} ({bytes} bytes): {header}>'.format(name=self.name, bytes=self.file_size, header=self.header.__repr__())
+        return f'<File {self.name} ({self.file_size} bytes): {self.header.__repr__()}>'
 
     def _read_file_name(self, buffer, offset: int, encoding: str) -> str:
         offset += struct.calcsize(File.file_format)

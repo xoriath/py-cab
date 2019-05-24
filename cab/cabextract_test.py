@@ -36,10 +36,8 @@ class CabExtractTests(unittest.TestCase):
 
             self.assertHeaderAndFiles(cab, h, files, cabextract_cases)
 
-    def test_mixed(self):
+    def _mixed(self):
         buffer = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab'))
-        
-        #import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, cab, h, files, cases):
         self.assertEqual(1, h.number_of_folders, 'Wrong number of folders in {}'.format(cab))

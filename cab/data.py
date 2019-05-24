@@ -48,10 +48,7 @@ class Data:
         self.logger.debug('Parsed data: %s', self.__repr__())
 
     def __repr__(self):
-        return '<Data checksum={cheksum} valid={valid} compressed={raw_size} uncompressed={uncompressed_size}>'.format(cheksum=self.checksum,
-                                                                                                                       valid=self.valid_checksum(),
-                                                                                                                       raw_size=self.raw_size,
-                                                                                                                       uncompressed_size=self.uncompressed_size)
+        return f'<Data checksum={self.checksum} valid={self.valid_checksum()} compressed={self.raw_size} uncompressed={self.uncompressed_size}>'
 
     @property 
     def raw_size(self):
@@ -73,15 +70,15 @@ class Data:
         return self.checksum == self.calculated_checksum
 
     def data(self):
-        if not self.checksum == self.calculated_checksum:
-            raise InvalidChecksum('Invalid checksum of data block ({actual} != {expected})'.format(actual=self.checksum, expected=self.calculated_checksum))
+        if not self.valid_checksum():
+            raise InvalidChecksum(f'Invalid checksum of data block ({self.checksum} != {self.calculated_checksum})')
 
         if self.compression == folder.Compression.NONE:
             return self.raw_data
         if self.compression == folder.Compression.MSZIP:
             return self.decompress_mszip()
 
-        raise UnhandledCompression('Cannot handle compression {compression}'.format(compression=self.compression))
+        raise UnhandledCompression(f'Cannot handle compression {self.compression}')
 
     def decompress_mszip(self):
         if not self.has_mszip_signature(self.raw_data):
@@ -105,7 +102,7 @@ class Data:
             wbits_deflate = -zlib.MAX_WBITS
             return zlib.decompress(buffer, wbits=wbits_deflate)
         except zlib.error as e:
-            raise CompressionCorruption('Failed to decompress data: ' + str(e))
+            raise CompressionCorruption(f'Failed to decompress data: {e}')
 
     
     def _calculate_checksum(self):

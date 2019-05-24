@@ -1,22 +1,22 @@
 
 import os.path
 
-import data
-import file
-import folder
-import header
+import cab.data
+import cab.file
+import cab.folder
+import cab.header
 
 class Cabinet:
 
     def __init__(self, buffer):
         self.buffer = buffer
         self.header = header.create(buffer)
-        self.folders = list(folder.create_folders(self.header, buffer))
-        self.files = list(file.create_files(self.header, buffer))
+        self.folders = list(cab.folder.create_folders(self.header, buffer))
+        self.files = list(cab.file.create_files(self.header, buffer))
 
         self.folder_and_files = list(( (f, list(self._find_files_in_folder(f)) ) for f in self.folders))
 
-        self.folder_and_datas = list(( (f, files, list(data.create_datas(self.header, f, buffer)) ) for (f, files) in self.folder_and_files))
+        self.folder_and_datas = list(( (f, files, list(cab.data.create_datas(self.header, f, buffer)) ) for (f, files) in self.folder_and_files))
         
     def _find_files_in_folder(self, f):
         for fi in self.files:
@@ -44,7 +44,7 @@ def open_cab(path):
         current_cab = read_cab(os.path.join(current_dir, current_cab.header.next_cabinet))
         cabinets[current_cab.header.sequence] = current_cab
 
-    #import pdb; pdb.set_trace()
+    return cabinets
 
 
 def read_cab(path):

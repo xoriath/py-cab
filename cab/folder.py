@@ -51,9 +51,7 @@ class Folder:
         self.logger.debug('Parsed folder: %s', self.__repr__())
 
     def __repr__(self):
-        return '<Folder index={index} compression={compression} data_entries={number_of_data_entries}>'.format(index=self.index,
-                                                                                                               compression=self.compression,
-                                                                                                               number_of_data_entries=self.number_of_data_entries)
+        return f'<Folder index={self.index} compression={self.compression} data_entries={self.number_of_data_entries}>'
 
     @property 
     def first_data_entry_offset(self):

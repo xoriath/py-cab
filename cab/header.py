@@ -32,10 +32,7 @@ class Header:
 
 
     def __repr__(self):
-        return '<Header signature={signature}, version={version}, folders={folders}, files={files}>'.format(signature=self.signature, 
-                                                                                                            version=self.version, 
-                                                                                                            folders=self.number_of_folders,
-                                                                                                            files=self.number_of_files)
+        return f'<Header signature={self.signature}, version={self.version}, folders={self.number_of_folders}, files={self.number_of_files}>'
 
     @property
     def signature(self):
