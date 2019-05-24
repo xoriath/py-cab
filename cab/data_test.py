@@ -2,12 +2,8 @@ import datetime
 import os
 import unittest
 
-import header
-import folder
-import data
-import cabinet
-
-from test_data import read_cabextract_cab, read_libmspack_cab, CABEXTRACT_TEST_DIR
+from cab import header, folder, data, cabinet
+from cab.test_data import read_cabextract_cab, read_libmspack_cab, CABEXTRACT_TEST_DIR
 
 class TestSimpleData(unittest.TestCase):
 
@@ -103,10 +99,10 @@ class TestHugeCompressedData(): # unittest.TestCase
         self.assertEqual(1, len(mszip_folders))
 
         mszip_folder = mszip_folders[0]
-        self.assertEqual(folder.Compression.MSZIP, mszip_folder.compression)
+        self.assertEqual(cab.folder.Compression.MSZIP, mszip_folder.compression)
         self.assertEqual(1, mszip_folder.number_of_data_entries)
 
-        datas = list(data.create_datas(self.cab.header, mszip_folder, self.cab.buffer))
+        datas = list(cab.data.create_datas(self.cab.header, mszip_folder, self.cab.buffer))
         self.assertEqual(1, len(datas))
         data_entry = datas[0]
 

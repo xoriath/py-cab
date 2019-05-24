@@ -1,15 +1,13 @@
 import struct
 import unittest
 
-import cab.header
-import cab.cabinet
-
+from cab import header, cabinet
 from cab.test_data import read_cabextract_cab, read_libmspack_cab
 
 class TestHeader(unittest.TestCase):
 
     def setUp(self):
-        self.cab = cab.read_cabextract_cab('simple.cab')
+        self.cab = read_cabextract_cab('simple.cab')
         self.header = header.Header(self.cab)
 
     def test_signature(self):
@@ -58,6 +56,6 @@ class TestHeaderErrorConditions(unittest.TestCase):
         f = read_libmspack_cab('bad_signature.cab')
         
         with self.assertRaises(struct.error):
-            cab.cabinet.Cabinet(f)
+            cabinet.Cabinet(f)
 
     
