@@ -8,6 +8,8 @@ pytest = "*"
 twine = "*"
 tox = "*"
 pylint = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
 
 [packages]
 cab = {editable = true,path = "."}
