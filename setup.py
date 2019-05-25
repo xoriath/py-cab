@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(name='cab',
       version='0.1',
@@ -7,5 +7,6 @@ setup(name='cab',
       author='Morten Engelhardt Olsen',
       author_email='moro.engelhardt@gmail.com',
       license='MIT',
-      packages=find_packages('cab'),  
-      zip_safe=False)
+      py_modules=['cabfile', 'cabinet', 'data', 'folder', 'header'],
+      package_dir={'': 'src'}
+)
