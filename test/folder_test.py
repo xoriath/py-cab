@@ -39,3 +39,8 @@ def test_number_of_data_entries(simple_folders):
 
 def test_data_entry_offset(simple_folders):
     assert 0x5E == simple_folders[0].first_data_entry_offset
+
+def test_segfault_folders():
+    cab = read_cabextract_bugs_cab('cve-2014-9732-folders-segfault.cab')
+    with pytest.raises(folder.UnknownFolderCompressionException):
+        return get_folders(cab)

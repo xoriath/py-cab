@@ -11,8 +11,9 @@ class Compression(enum.Enum):
     QUANTUM = enum.auto()
     LZX = enum.auto()
 
-class FolderException(Exception):
-    pass
+class UnknownFolderCompressionException(Exception):
+    def __init__(self, arg):
+        Exception.__init__(self, 'Folder compression 0x{:02X} is not known'.format(arg & Folder.cffoldCOMPTYPE_MASK))
 
 class Folder:
     """Each CFFOLDER structure contains information about one of the folders or partial folders stored in this cabinet file. 
@@ -72,7 +73,7 @@ class Folder:
         if self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK == Folder.cffoldCOMPTYPE_LZX:
             return Compression.LZX
 
-        raise FolderException('Folder compression 0x{:02X} is not known'.format(self.header.typeCompress & Folder.cffoldCOMPTYPE_MASK))
+        raise UnknownFolderCompressionException(self.header.typeCompress)
 
     @property
     def size(self):
