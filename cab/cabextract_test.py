@@ -2,7 +2,7 @@
 import unittest
 import os.path
 
-from cab import cabinet, data, header, folder, file
+from cab import cabinet, data, header, folder, cabfile
 from cab.test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
 
 
@@ -28,12 +28,14 @@ class CabExtractTests(unittest.TestCase):
             cabextract_cases = read_cabextract_cases(cases, encoding=encoding)
             
             h = header.create(buffer)
-            files = list(file.create_files(h, buffer, encoding=encoding))
+            files = list(cabfile.create_files(h, buffer, encoding=encoding))
 
             self.assertHeaderAndFiles(cab, h, files, cabextract_cases)
 
     def _mixed(self):
-        buffer = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab'))
+        split4 = os.path.join(CABEXTRACT_TEST_DIR, 'split-4.cab')
+        buffer = cabinet.open_cab(split4)
+        import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, cab, h, files, cases):
         self.assertEqual(1, h.number_of_folders, 'Wrong number of folders in {}'.format(cab))

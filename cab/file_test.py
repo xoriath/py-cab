@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from cab import header, file
+from cab import header, cabfile
 from cab.test_data import read_cabextract_cab
 
 class TestFile(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestFile(unittest.TestCase):
     def setUp(self):
         self.cab = read_cabextract_cab('simple.cab')
         self.header = header.Header(self.cab)
-        self.files = list(file.create_files(self.header, self.cab))
+        self.files = list(cabfile.create_files(self.header, self.cab))
 
     def test_found_files(self):
         self.assertEqual(2, len(self.files))

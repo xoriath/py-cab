@@ -32,7 +32,12 @@ class Header:
 
 
     def __repr__(self):
-        return f'<Header signature={self.signature}, version={self.version}, folders={self.number_of_folders}, files={self.number_of_files}>'
+        base = f'<Header signature={self.signature}, version={self.version}, folders={self.number_of_folders}, files={self.number_of_files}'
+        if self.has_previous_cabinet:
+            base += f' Previous={self.previous_cabinet}'
+        if self.has_next_cabinet:
+            base += f' Next={self.next_cabinet}'
+        return base + '>'
 
     @property
     def signature(self):

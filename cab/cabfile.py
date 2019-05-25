@@ -4,7 +4,7 @@ import datetime
 import logging
 import struct
 
-class File:
+class CabFile:
     """Each CFFILE entry contains information about one of the files stored (or at least partially stored) in this cabinet. 
     The first CFFILE entry in each cabinet is found at absolute offset CFHEADER.coffFiles. In a standard cabinet file the 
     first CFFILE entry immediately follows the last CFFOLDER entry. Subsequent CFFILE records for this cabinet are contiguous.
@@ -33,18 +33,18 @@ class File:
     _A_NAME_IS_UTF = 0x80
 
     def __init__(self, buffer, offset: int, encoding: str):
-        self.header = File.file_tuple._make(struct.unpack_from(File.file_format, buffer=buffer, offset=offset))
+        self.header = CabFile.file_tuple._make(struct.unpack_from(CabFile.file_format, buffer=buffer, offset=offset))
         (self.name, self.name_length_bytes) = self._read_file_name(buffer, offset, encoding)
         
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = logging.getLogger(CabFile.__name__)
         self.logger.debug('Parsed file: %s', self.__repr__())
 
     def __repr__(self):
-        return f'<File {self.name} ({self.file_size} bytes): {self.header.__repr__()}>'
+        return f'<File {self.name} ({self.file_size} bytes, partial={self.is_partial}): {self.header.__repr__()}>'
 
     def _read_file_name(self, buffer, offset: int, encoding: str) -> str:
-        offset += struct.calcsize(File.file_format)
-        strings = buffer[offset : offset + File.MAX_STRING_LENGTH].split(b'\x00')
+        offset += struct.calcsize(CabFile.file_format)
+        strings = buffer[offset : offset + CabFile.MAX_STRING_LENGTH].split(b'\x00')
         
         if encoding:
             return (strings[0].decode(encoding=encoding, errors='replace'), len(strings[0]))
@@ -56,27 +56,27 @@ class File:
 
     @property
     def is_read_only(self) -> bool:
-        return self.header.attribs & File._A_RDONLY != 0
+        return self.header.attribs & CabFile._A_RDONLY != 0
 
     @property
     def is_hidden(self) -> bool:
-        return self.header.attribs & File._A_HIDDEN != 0
+        return self.header.attribs & CabFile._A_HIDDEN != 0
 
     @property
     def is_system(self) -> bool:
-        return self.header.attribs & File._A_SYSTEM != 0
+        return self.header.attribs & CabFile._A_SYSTEM != 0
 
     @property
     def is_modified_since_last_backup(self) -> bool:
-        return self.header.attribs & File._A_ARCH != 0
+        return self.header.attribs & CabFile._A_ARCH != 0
 
     @property
     def run_after_extraction(self) -> bool:
-        return self.header.attribs & File._A_EXEC != 0
+        return self.header.attribs & CabFile._A_EXEC != 0
     
     @property
     def is_name_utf(self) -> bool:
-        return self.header.attribs & File._A_NAME_IS_UTF != 0
+        return self.header.attribs & CabFile._A_NAME_IS_UTF != 0
 
     @property 
     def file_size(self) -> int:
@@ -89,6 +89,22 @@ class File:
     @property
     def folder_index(self) -> int:
         return self.header.iFolder
+
+    @property
+    def is_continued_from_previous(self) -> bool:
+        return self.folder_index == CabFile.ifoldCONTINUED_FROM_PREV
+    
+    @property
+    def is_continued_to_next(self) -> bool:
+        return self.folder_index == CabFile.ifoldCONTINUED_TO_NEXT
+        
+    @property
+    def is_continued_from_previous_and_to_next(self) -> bool:
+        return self.folder_index == CabFile.ifoldCONTINUED_PREV_AND_NEXT
+
+    @property
+    def is_partial(self) -> bool:
+        return self.is_continued_from_previous or self.is_continued_to_next or self.is_continued_from_previous_and_to_next
 
     @property
     def date(self):
@@ -118,7 +134,7 @@ class File:
 
     @property
     def size(self):
-        return struct.calcsize(File.file_format) + self.name_length_bytes + 1 # +1 for NULL in name string
+        return struct.calcsize(CabFile.file_format) + self.name_length_bytes + 1 # +1 for NULL in name string
 
 
 def create_files(header, buffer, encoding=None):
@@ -126,7 +142,7 @@ def create_files(header, buffer, encoding=None):
     offset = header.first_file_enty_offset
 
     for _ in range(number_of_files):
-        file = File(buffer, offset, encoding)
+        file = CabFile(buffer, offset, encoding)
         offset += file.size
         yield file
         
