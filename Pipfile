@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 twine = "*"
+tox = "*"
 
 [packages]
 cab = {editable = true,path = "."}
