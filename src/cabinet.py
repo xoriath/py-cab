@@ -1,7 +1,7 @@
 
 import os.path
 
-from cab import data, cabfile, folder, header
+import data, cabfile, folder, header
 
 class Cabinet:
 

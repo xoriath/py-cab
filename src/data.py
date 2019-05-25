@@ -5,7 +5,7 @@ import logging
 import struct
 import zlib
 
-from cab import folder
+import folder
 
 class InvalidChecksum(Exception):
     pass

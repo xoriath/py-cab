@@ -2,8 +2,8 @@
 import unittest
 import os.path
 
-from cab import cabinet, data, header, folder, cabfile
-from cab.test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
+import cabinet, data, header, folder, cabfile
+from test_data import read_cabextract_cab, read_cabextract_cases, CABEXTRACT_TEST_DIR
 
 
 
@@ -38,12 +38,12 @@ class CabExtractTests(unittest.TestCase):
         import pdb; pdb.set_trace()
 
     def assertHeaderAndFiles(self, cab, h, files, cases):
-        self.assertEqual(1, h.number_of_folders, 'Wrong number of folders in {}'.format(cab))
-        self.assertEqual(len(cases), h.number_of_files, 'Wrong number of files in {}'.format(cab))
+        assert 1 == h.number_of_folders, 'Wrong number of folders in {}'.format(cab)
+        assert len(cases) == h.number_of_files, 'Wrong number of files in {}'.format(cab)
 
         for (f, case) in zip(files, cases):
-            self.assertEqual(case, f.name, '[{cab}] Error in case: \n{case} != \n{name}'.format(
+            assert case == f.name, '[{cab}] Error in case: \n{case} != \n{name}'.format(
                                             cab=cab, 
                                             case=":".join(c.encode().hex() for c in case), 
-                                            name=":".join(c.encode().hex() for c in f.name)))
+                                            name=":".join(c.encode().hex() for c in f.name))
 
