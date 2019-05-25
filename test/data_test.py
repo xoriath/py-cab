@@ -2,9 +2,11 @@ import datetime
 import os
 import unittest
 
+import pytest
+
 import header, folder, data, cabinet
 from test_data import read_cabextract_cab, read_libmspack_cab, CABEXTRACT_TEST_DIR
-import pytest
+
 
 class TestSimpleData(unittest.TestCase):
 
@@ -87,9 +89,11 @@ class TestCompressedData(unittest.TestCase):
        
 
 class TestHugeCompressedData(unittest.TestCase):
+    
     def setUp(self):
         self.cab = cabinet.open_cab(os.path.join(CABEXTRACT_TEST_DIR, 'large-files-cab.cab'))
 
+    @pytest.mark.skip(reason='Need to unwrap this cab twice')
     def test_mszip_compression(self):
         mszip_files = list(filter(lambda x: x.name == 'mszip-2gb.txt', self.cab.files))
         assert 1 == len(mszip_files)
