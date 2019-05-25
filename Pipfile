@@ -10,6 +10,7 @@ tox = "*"
 pylint = "*"
 pytest-cov = "*"
 pytest-xdist = "*"
+coverage = "*"
 
 [packages]
 cab = {editable = true,path = "."}
