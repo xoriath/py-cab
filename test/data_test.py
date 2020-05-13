@@ -96,7 +96,53 @@ def test_cve_2015_4470_mszip_over_read():
     with pytest.raises(data.InvalidChecksum):
         data_blocks[0].data()
 
+def test_bad_nofiles():
+    f = read_libmspack_cab('bad_nofiles.cab')
+    cab = cabinet.Cabinet(f)
+    assert len(cab.files) == 0
+
+def test_bad_nofolders():
+    f = read_libmspack_cab('bad_nofolders.cab')
+    with pytest.raises(cabinet.InvalidFileAllocation):
+        cab = cabinet.Cabinet(f)
+
+def test_bad_signature():
+    f = read_libmspack_cab('bad_signature.cab')
+    with pytest.raises(folder.InvalidFolderHeader):
+        cab = cabinet.Cabinet(f)
+
        
+def test_bad_folderindex():
+    f = read_libmspack_cab('bad_folderindex.cab')
+    with pytest.raises(cabinet.InvalidFileAllocation):
+        cab = cabinet.Cabinet(f)
+
+def test_filename_read_violation_1():
+    f = read_libmspack_cab('filename-read-violation-1.cab')
+    with pytest.raises(cabinet.EmptyFileName):
+        cab = cabinet.Cabinet(f)
+
+@pytest.mark.skip(reason='Current filename parser uses .decode(..., errors=replace)')
+def test_filename_read_violation_2():
+    f = read_libmspack_cab('filename-read-violation-2.cab')
+    #with pytest.raises(UnicodeDecodeError):
+    #    cab = cabinet.Cabinet(f)
+    # The current file name parsers uses error replacement instead of errors
+
+@pytest.mark.skip(reason='Current filename parser uses .decode(..., errors=replace)')
+def test_filename_read_violation_3():
+    f = read_libmspack_cab('filename-read-violation-3.cab')
+    #with pytest.raises(UnicodeDecodeError):
+    #    cab = cabinet.Cabinet(f)
+    # The current file name parsers uses error replacement instead of errors
+
+def test_filename_read_violation_4():
+    f = read_libmspack_cab('filename-read-violation-4.cab')
+    with pytest.raises(data.DataHeaderError):
+        cab = cabinet.Cabinet(f)
+    
+
+
 
 @pytest.fixture
 def large_files_cab():

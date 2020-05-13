@@ -19,6 +19,9 @@ class InvalidCompressionPrefix(Exception):
 class CompressionCorruption(Exception):
     pass
 
+class DataHeaderError(Exception):
+    pass
+
 class Data:
     """Each CFDATA record describes some amount of compressed data. 
     
@@ -31,7 +34,11 @@ class Data:
     data_format = '<I2H'
 
     def __init__(self, buffer: bytearray, offset: int, compression: folder.Compression, reserved_size: int):
-        self.header = Data.data_tuple._make(struct.unpack_from(Data.data_format, buffer=buffer, offset=offset))
+        try:
+            self.header = Data.data_tuple._make(struct.unpack_from(Data.data_format, buffer=buffer, offset=offset))
+        except struct.error as e:
+            raise DataHeaderError(f"Failed to read data header: {e}")
+
         self.compression = compression
 
         reserved_start = offset + struct.calcsize(Data.data_format)

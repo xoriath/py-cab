@@ -2,7 +2,7 @@ import struct
 
 import pytest
 
-import header, cabinet
+import header, cabinet, folder
 from test_data import read_cabextract_cab, read_libmspack_cab
 
 @pytest.fixture
@@ -53,6 +53,6 @@ def test_header_size(simple_header):
 def test_bad_signature():
     f = read_libmspack_cab('bad_signature.cab')
     
-    with pytest.raises(struct.error):
+    with pytest.raises(folder.InvalidFolderHeader):
         cabinet.Cabinet(f)
 

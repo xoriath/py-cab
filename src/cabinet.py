@@ -1,11 +1,23 @@
 
 import os.path
+from functools import reduce
+import operator
 
 import data, cabfile, folder, header
 
+
+class InvalidCabinet(Exception):
+    pass
+
+class InvalidFileAllocation(InvalidCabinet):
+    pass
+
+class EmptyFileName(InvalidCabinet):
+    pass
+
 class Cabinet:
 
-    def __init__(self, buffer):
+    def __init__(self, buffer, verify_integrity=True):
         self.buffer = buffer
         self.header = header.create(buffer)
         self.folders = list(folder.create_folders(self.header, buffer))
@@ -13,10 +25,28 @@ class Cabinet:
         self.datas = { folder: list(data.create_datas(self.header, folder, buffer)) for folder in self.folders }
 
         self.resolve()
+
+        if verify_integrity:
+            self.verify()
         
     def resolve(self):
         self.folder_and_files = [( folder, list(find_files_in_folder(self.files, folder)) ) for folder in self.folders]
         self.folder_and_datas = list(( (f, files, self.datas[f]) for (f, files) in self.folder_and_files))
+
+    def verify(self):
+        self.verify_all_files_allocated_to_folder()
+        self.verify_filenames()
+
+    def verify_all_files_allocated_to_folder(self):
+        files_in_folders = reduce(operator.concat, [folder_and_files_list[1] for folder_and_files_list in self.folder_and_files], [])
+        if len(self.files) != len(files_in_folders):
+            files_without_folder = set(self.files).symmetric_difference(set(files_in_folders))
+            raise InvalidFileAllocation(f"Files not allocated to a folder: {files_without_folder}")
+
+    def verify_filenames(self):
+        if any(not file.name for file in self.files):
+            raise EmptyFileName("File with empty name in cabinet")
+
         
 def find_files_in_folder(files, folder):
     for fi in files:

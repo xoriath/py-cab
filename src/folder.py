@@ -15,6 +15,9 @@ class UnknownFolderCompressionException(Exception):
     def __init__(self, arg):
         Exception.__init__(self, 'Folder compression 0x{:02X} is not known'.format(arg & Folder.cffoldCOMPTYPE_MASK))
 
+class InvalidFolderHeader(Exception):
+    pass
+
 class Folder:
     """Each CFFOLDER structure contains information about one of the folders or partial folders stored in this cabinet file. 
     The first CFFOLDER entry immediately follows the CFHEADER entry and subsequent CFFOLDER records for this cabinet are contiguous. 
@@ -43,7 +46,10 @@ class Folder:
 
     def __init__(self, index, buffer, offset, reserved):
         self.index = index
-        self.header = Folder.folder_tuple._make(struct.unpack_from(Folder.folder_format, buffer=buffer, offset=offset))
+        try:
+            self.header = Folder.folder_tuple._make(struct.unpack_from(Folder.folder_format, buffer=buffer, offset=offset))
+        except struct.error as e:
+            raise InvalidFolderHeader(f"Failed to parse folder {self.index}: {e}")
 
         reserved_offset = offset + struct.calcsize(Folder.folder_format)
         self.reserved = buffer[reserved_offset : reserved_offset + reserved]
